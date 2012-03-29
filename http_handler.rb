@@ -22,9 +22,13 @@ class HTTPHandler
 
                         if headers['Upgrade'] == 'WebSocket'
 				socket.ws_handshake headers
-				# add it to server
+				server.add socket
 			else
-				puts request
+				if path == '/'
+					# main page
+				else
+					# explode
+				end
 			end
                 else
                         puts "request didn't match: #{request}"

@@ -1,15 +1,19 @@
+require 'socket'
+
+require 'accept_handler.rb'
+
 class Server
 	def initialize
 		@sockets = {}
 	end
 
-	def run( port )
-		require 'socket'
+	def add( socket )
+		@sockets[ socket ] = 10
+	end
 
+	def run( port )
 		socket = TCPServer.new( port )
                 socket.listen( 5 )
-
-		require 'accept_handler.rb'
 
 		@sockets[ socket ] = AcceptHandler.new( self )
 
