@@ -1,31 +1,24 @@
-request_pattern = /^GET (.*) HTTP\/1\.1$/
-header_pattern = /^([^:]+): (.*)$/
+require 'string'
+
 
 class HTTPHandler
+	@@request_pattern = /^GET (.*) HTTP\/1\.1$/
+	@@header_pattern = /^([^:]+): (.*)$/
+
 	#def intialize( <some server reference to add/remove clients or something> )
 	#end
 
 	def handle( socket )
-		if socket.readline.chomp.match request_pattern
+		if socket.readline.chomp.match @@request_pattern
 			headers = {}
 
-			while socket.readline.chomp.match header_pattern
+			while socket.readline.chomp.match @@header_pattern
 				headers[ $1 ] = $2
 			end
 
 			# do some processing
 		else
 			# throw an error or something
-		end
-	end
-end
-
-class String
-	def to_i!
-		i = to_i
-
-		unless i == 0 and not ( @self == '0' )
-			i
 		end
 	end
 end
@@ -49,6 +42,8 @@ when there is activity on a socket
 	end
 end
 
+require 'socket'
+
 def Server
 	def initialize
 		@sockets = {}
@@ -66,7 +61,6 @@ def Server
 		end
 	end
 end
-
 
 if port = ARGV[0] && ARGV[0].to_i!
 	Server.new.run( port )
