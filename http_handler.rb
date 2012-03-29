@@ -1,21 +1,33 @@
+require 'websocket.rb'
+
 class HTTPHandler
         @@request_pattern = /^GET (.*) HTTP\/1\.1$/
         @@header_pattern = /^([^:]+): (.*)$/
 
-        #def intialize( <some server reference to add/remove clients or something> )
-        #end
+        def initialize( server )
+                @server = server
+        end
 
         def handle( socket )
-                if socket.readline.chomp.match @@request_pattern
+		request = socket.readline.chomp
+
+                if request.match @@request_pattern
+			path = $1
+
                         headers = {}
 
                         while socket.readline.chomp.match @@header_pattern
                                 headers[ $1 ] = $2
                         end
 
-                        # do some processing
+                        if headers['Upgrade'] == 'WebSocket'
+				socket.ws_handshake headers
+				# add it to server
+			else
+				puts request
+			end
                 else
-                        # throw an error or something
+                        puts "request didn't match: #{request}"
                 end
         end
 end
