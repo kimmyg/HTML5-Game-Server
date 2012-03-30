@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script type="text/javascript" src="js/prelude.js"></script>
+<script type="text/javascript">
+window.addEventListener( 'load', function( event ) {
+	window.ws = new WebSocket( 'ws://' + window.location.host + '/' );
+
+	window.ws.addEventListener( 'open', function( event ) {
+		console.log( 'opened' );
+	});
+
+	window.ws.addEventListener( 'message', function( event ) {
+		console.log( event );
+	});
+
+	window.ws.addEventListener( 'close', function( event ) {
+		console.log( 'closed' );
+	});
+});
+</script>
+</head>
+
+<body>
+</body>
+
+</html>
+

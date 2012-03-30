@@ -1,37 +1,55 @@
 require 'websocket.rb'
 
+require 'http_request.rb'
+require 'http_response.rb'
+
 class HTTPHandler
-        @@request_pattern = /^GET (.*) HTTP\/1\.1$/
-        @@header_pattern = /^([^:]+): (.*)$/
+	@@types = {
+		'html' => 'text/html',
+		'js' => 'application/json'
+	}
 
-        def initialize( server )
-                @server = server
-        end
 
-        def handle( socket )
-		request = socket.readline.chomp
+	def self.typeForPath( path )
+		if path.match /\.([^\.]*)$/
+			extension = $1
 
-                if request.match @@request_pattern
-			path = $1
+			@@types[ extension ] 	# this is a bad return value
+						# because we won't know if the path was malformed
+						# or if we didn't have a mime type for the path
+		end
+	end
 
-                        headers = {}
+	def initialize( server )
+		@server = server
+	end
 
-                        while socket.readline.chomp.match @@header_pattern
-                                headers[ $1 ] = $2
-                        end
-
-                        if headers['Upgrade'] == 'WebSocket'
-				socket.ws_handshake headers
-				server.add socket
-			else
-				if path == '/'
-					# main page
-				else
-					# explode
-				end
+	def handle( socket )
+		request = HTTPRequest.read( socket )
+	
+		if request.method == :GET
+			puts "this may be an upgrade request"
+		
+			path = request.path
+		
+			if path == '/'
+				path = '/index.html'
 			end
-                else
-                        puts "request didn't match: #{request}"
-                end
-        end
+			
+			path = 'resources' + path
+			
+			response = nil
+			
+			if File.exist? path and not ( File.directory? path )
+				response = HTTPResponse.new( 200, 'OK' )
+				response.set_body( File.read( path ), HTTPHandler.typeForPath( path ) )
+			else
+				response = HTTPResponse.new( 404, 'Not Found' )
+			end
+			
+			response.write( socket )
+			
+			socket.close # TAKE THIS OUT!!!!
+		end
+	end
 end
