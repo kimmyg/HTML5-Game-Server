@@ -1,0 +1,40 @@
+dig a pit for thy neighbour
+
+the game has two phases: the main phase and the ending phase.
+
+during the main phase, a player has one of three options:
+
+discard and draw
+meld
+challenge
+
+once discard and draw is specified, it only requires the specification of the card to discard.
+once meld is specified, it requires the specification of two cards with which to meld. these can come from the n (three, typically) in the hand and the discard pile.
+once challenge is specified, the card with which to challenge must be specified and the pile to challenge. there are times when either of these are unnecessary, but for simplicity, we may require both.
+
+game functionality is modal in the sense that game control input can come from only one player at a time. this is typically sequentially, but in a challenge, there is an oscillation.
+
+during the ending phase, a player has one of three options:
+
+pass
+meld
+challenge
+
+pass is simple enough and the game ends when everyone passes in a row.
+challenge is the same as other challenges except no card is drawn. architectured correctly, there should be no distinction.
+
+during a challenge phase, a player can either play a card or forfeit. because a player may employ a strategy even when no cards would work, they must explicitly forfeit so that information isn't leaked. the game should never pre-empt the player and should only enforce the rules. it should be a dumb server in this sense.
+
+the necessary interface to the game is the command list, the discard pile, the draw pile (visual indicator only), the piles of the opponents (with heights--last few perhaps or some way of hiding it), and the player's own pile and hand.
+
+when the player has no melds, the challenge button should be disabled.
+each action (with the exception of pass) requires additional input. a cancel button should be available.
+confirmation should be necessary to pass. this could be done with the native interface. it would be easier, but it would be better to make it seamless with the other stuff.
+
+once everyone passes, the server counts all the points and sends their totals, perhaps with other stats like number of jokers and wilds.
+
+gather the game
+start
+
+defend
+

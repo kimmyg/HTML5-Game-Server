@@ -23,6 +23,7 @@ module HTTPRequest
 
 	def self.read( socket )
 		request = socket.readline.chomp
+		#puts request
 
 		if request.match @@request_pattern
 			method, path = $1, $2
@@ -31,6 +32,7 @@ module HTTPRequest
 
 			while socket.readline.chomp.match @@header_pattern
 				headers[ $1 ] = $2
+				#puts "#{$1}: #{$2}"
 			end
 
 			case method

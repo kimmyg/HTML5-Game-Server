@@ -26,15 +26,19 @@ class HTTPResponse
 
 	def write( socket )
 		socket.write "HTTP/1.1 #{@code} #{@message}\r\n"
+		#print "HTTP/1.1 #{@code} #{@message}\r\n"
 
 		@headers.each do |key,value|
 			socket.write "#{key}: #{value}\r\n"
+			#print "#{key}: #{value}\r\n"
 		end
 
 		socket.write "\r\n"
+		#print "\r\n"
 
 		if @body
 			socket.write @body
+			#print @body
 		end
 	end
 end

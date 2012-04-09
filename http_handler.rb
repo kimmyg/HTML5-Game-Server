@@ -6,18 +6,14 @@ require 'http_response.rb'
 class HTTPHandler
 	@@types = {
 		'html' => 'text/html',
-		'js' => 'application/json'
+		'js' => 'application/javascript'
 	}
 
 
 	def self.typeForPath( path )
-		if path.match /\.([^\.]*)$/
-			extension = $1
-
-			@@types[ extension ] 	# this is a bad return value
+		@@types[ path.split('.').last ] # this is a bad return value
 						# because we won't know if the path was malformed
 						# or if we didn't have a mime type for the path
-		end
 	end
 
 	def initialize( server )
@@ -25,11 +21,19 @@ class HTTPHandler
 	end
 
 	def handle( socket )
+		puts "handling #{socket}"
 		request = HTTPRequest.read( socket )
 	
-		if request.method == :GET
-			puts "this may be an upgrade request"
-		
+		case request.method
+		when :GET then handleGet( socket, request )
+		else raise "unknown request method #{request.method}"
+		end
+	end
+	
+	def handleGet( socket, request )
+		if request.header( 'Upgrade' ) == 'WebSocket'
+			#socket.ws_handshake( request.headers )
+		else
 			path = request.path
 		
 			if path == '/'
@@ -49,7 +53,10 @@ class HTTPHandler
 			
 			response.write( socket )
 			
-			socket.close # TAKE THIS OUT!!!!
+			if request.header( 'Connection' ) == 'close'
+				@server.remove( socket )
+				socket.close
+			end
 		end
 	end
 end

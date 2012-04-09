@@ -7,8 +7,14 @@ class Server
 		@sockets = {}
 	end
 
-	def add( socket )
-		@sockets[ socket ] = 10
+	def setHandler( socket, handler )
+		puts "adding #{socket}"
+		@sockets[ socket ] = handler
+	end
+	
+	def removeHandler( socket )
+		puts "removing #{socket}"
+		@sockets.delete( socket )
 	end
 
 	def run( port )
