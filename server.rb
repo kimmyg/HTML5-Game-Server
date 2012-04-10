@@ -8,12 +8,12 @@ class Server
 	end
 
 	def setHandler( socket, handler )
-		puts "adding #{socket}"
+		puts "set handler #{handler} for socket #{socket}"
 		@sockets[ socket ] = handler
 	end
 	
 	def removeHandler( socket )
-		puts "removing #{socket}"
+		puts "removed handler for socket #{socket}"
 		@sockets.delete( socket )
 	end
 

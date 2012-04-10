@@ -19,6 +19,12 @@ module HTTPRequest
 		def header( key )
 			@headers[ key ]
 		end
+		
+		attr_reader :path, :headers
+		
+		def to_s
+			"GET #{@path} HTTP/1.1"
+		end
 	end
 
 	def self.read( socket )

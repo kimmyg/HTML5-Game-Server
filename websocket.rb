@@ -2,7 +2,7 @@ require 'md5'
 require 'socket'
 
 class TCPSocket
-  def ws_handshake( headers )
+  def ws_handshake( path, headers )
     u = headers['Sec-WebSocket-Key1'].gsub( /\D/, '' ).to_i / headers['Sec-WebSocket-Key1'].gsub( /\S/, '' ).length
     v = headers['Sec-WebSocket-Key2'].gsub( /\D/, '' ).to_i / headers['Sec-WebSocket-Key2'].gsub( /\S/, '' ).length
     w = read( 8 )

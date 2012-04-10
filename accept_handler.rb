@@ -7,6 +7,8 @@ class AcceptHandler
 	end
 
 	def handle( socket )
+		puts "accept handle #{socket}"
+	
 		@server.setHandler( socket.accept, @http_handler )
 	end
 end

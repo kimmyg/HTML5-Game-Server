@@ -2,9 +2,11 @@ require 'websocket.rb'
 
 require 'http_request.rb'
 require 'http_response.rb'
+require 'websocket_handler.rb'
 
 class HTTPHandler
 	@@types = {
+		'css' => 'text/css',
 		'html' => 'text/html',
 		'js' => 'application/javascript'
 	}
@@ -18,10 +20,13 @@ class HTTPHandler
 
 	def initialize( server )
 		@server = server
+		
+		@websocket_handler = WebSocketHandler.new( server )
 	end
 
 	def handle( socket )
-		puts "handling #{socket}"
+		puts "http handle #{socket}"
+	
 		request = HTTPRequest.read( socket )
 	
 		case request.method
@@ -32,7 +37,9 @@ class HTTPHandler
 	
 	def handleGet( socket, request )
 		if request.header( 'Upgrade' ) == 'WebSocket'
-			#socket.ws_handshake( request.headers )
+			socket.ws_handshake( request.path, request.headers )
+		
+			@websocket_handler.add( socket )
 		else
 			path = request.path
 		
