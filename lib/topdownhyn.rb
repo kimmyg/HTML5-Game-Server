@@ -182,7 +182,7 @@ class G
 	end
 
 	def turn
-		@states.last.data[:turn] + 1
+		@states.last.data[:turn] && @states.last.data[:turn] + 1
 	end
 
 	def next_turn
@@ -200,7 +200,8 @@ class G
 				send( aid, @hands[ aid ].last )
 
 				if @draw_pile.length == 0
-					@states.last.state = :tail
+					# @states.last.state = :tail
+					# do the above after this turn and before the next, but still broadcast below so pile will look empty
 					broadcast( "draw pile is empty" )
 				end
 
@@ -237,4 +238,124 @@ class G
 			send( aid, 'cannot discard in this phase of the game' )
 		end
 	end
+
+	def challenge( aid, cid, pid )
+		if state == :normal
+			if turn == aid
+				begin
+					card = resolve( cid )
+
+					if card has same value as pile pid
+						@states << S.new( :challenge, { :challenger => aid, :defender => pid, :pile => [card] } )
+						broadcast( "#{aid} challenges #{pid} with #{card}" )
+					else
+						send( aid, 'cards need same value' )
+					end
+
+				rescue DiscardPileEmptyError
+					send( aid, 'the discard pile is empty' )
+				end	
+			else
+				send( aid, 'it\'s not your turn' )
+			end
+		else
+			send( aid, 'cannot challenge at this time' )
+		end
+	end
+
+	def counter( aid, cid )
+		if state == :challenge
+			if @states.top.data[:pile].length % 2 == 0
+				if aid == @states.top.data[:challenger]
+				
+				elsif aid == @states.top.data[:defender]
+					send( aid, "you must wait for challenger" )
+				else
+					send( aid, 'it\'s not your turn' )
+				end
+			else
+				if aid == @states.top.data[:defender]
+
+				elsif aid == @states.top.data[:challenger]
+					send( aid, 'you must wait for them to retaliate' )
+				
+			end
+	end
+
+	def forfeit( aid )
+		if state == :challenge
+			if @states.last.data[:pile].length % 2 == 0
+				if aid == @states.last.data[:challenger]
+					pile = @piles[ aid ].last
+					pile.add( @states.last.data[:pile]
+
+					#broadcast new height, winner
+					@states.pop
+					next_turn
+				elsif aid == @states.last.data[:defender]
+					# inform defender no need
+				else
+					# inform not turn
+				end
+			else
+				if aid == @states.last.data[:defender]
+					pile = @piles[ aid ].pop
+					pile.add( @states.last.data[:pile] )
+				
+					# broadcast new top piles, heights, etc.
+					@states.pop
+					next_turn
+				elsif aid == @states.last.data[:challenger]
+					# inform challenger no need
+				else
+					#inform not turn
+				end
+			end
+	end
+end
+
+
+class G-Host
+	def initialize( n )
+		@word = []
+
+		@states = []
+		@states << S.new( :normal, { :turn => 0, :last_turn => nil } )
+	end
+
+	def add( aid, letter )
+		if state == :normal
+			if turn == aid
+				@word << letter
+				broadcast( letter )
+				next_turn
+			else
+				# inform not turn
+			end
+		else
+			# inform not state
+		end
+	end
+
+	def declare( aid )
+		if state == :normal
+			if turn == aid
+				if @word.length < 3
+					send( aid, 'not at least three letters' )
+				else
+					# do something
+				end
+			else
+				# not turn
+			end
+		else
+			# not state
+		end
+	end
+
+	def challenge( aid )
+		
+	end
+
+	# and voting methods
 end
