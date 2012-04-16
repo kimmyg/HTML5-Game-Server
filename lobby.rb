@@ -2,9 +2,12 @@
 
 
 class Lobby
+	def initialize( server )
+		@server = server
+	end
 
 	def add( socket )
-	
+		socket.ws_send( { 'load' => 'lobby' }.to_json )	
 	end
 	
 	def remove( socket )

@@ -12,7 +12,9 @@ window.addEventListener( 'load', function( event ) {
 	});
 
 	window.ws.addEventListener( 'message', function( event ) {
-		console.log( event );
+		var message = JSON.parse( event.data );
+
+		console.log( message );
 	});
 
 	window.ws.addEventListener( 'close', function( event ) {

@@ -459,3 +459,26 @@ end
 
 
 =end
+
+=begin
+
+now is the time to define the consequence of a connection being lost. one should 
+be able to reconnect but the others should be able to kick the player (if the game 
+supports such an action) or quit the game.
+
+G-Host in a conceptual server-side javascript
+
+function G-Host( n ) {
+	this.n = n;
+}
+
+G-Host.prototype.add = function( sender, letter ) {
+	if( this.state ==
+}
+
+let's put that on hold for now. here is a use case for the client:
+
+we get a package of resources to load. when they are loaded, we send the 
+server a ready message.
+
+=end
