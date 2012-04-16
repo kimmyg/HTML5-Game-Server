@@ -27,7 +27,7 @@ class Server
 
 		while true
 			select( @sockets.keys, nil, nil )[0].each do |socket|
-				@sockets[ socket ].handle socket
+				@sockets[ socket ].handle( socket )
 			end
 		end
 	end

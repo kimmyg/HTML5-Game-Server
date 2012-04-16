@@ -61,7 +61,7 @@ class HTTPHandler
 			response.write( socket )
 			
 			if request.header( 'Connection' ) == 'close'
-				@server.remove( socket )
+				@server.removeHandler( socket )
 				socket.close
 			end
 		end

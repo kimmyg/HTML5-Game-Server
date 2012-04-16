@@ -332,18 +332,51 @@ class G-Host
 			else
 				# inform not turn
 			end
+		elsif state == :challenge
+			if @state.last.data[:challengee] == aid
+				@word << letter
+				broadcast( letter )
+			end
 		else
 			# inform not state
 		end
 	end
-
+	
+	def remove( aid )
+		if state == :challenge
+			if @state.last.data[:challengee] == aid
+				if @word.length > @states.last.data[:length]
+					@word.pop
+					broadcast( 'delete letter' )
+				end
+			else
+				# not turn
+			end
+		end
+	end
+	
+	def finish( aid )
+		if state == :challenge
+			if @state.last.data[:challengee] == aid
+				data = @states.pop.data
+				@states << S.new( :declare, { :declarer => data[:challengee], :declaree => data[:challenger], :yea => Set.new( [aid] ), :nay => Set.new } )
+			else
+				# not turn
+			end
+		else
+			# not state
+		end
+	end
+	
 	def declare( aid )
 		if state == :normal
 			if turn == aid
 				if @word.length < 3
 					send( aid, 'not at least three letters' )
 				else
-					# do something
+					declaree = @states.pop.data[:last_turn]
+					@states << S.new( :declare, { :declarer => aid, :declaree => declaree, :yea => Set.new( [ aid ] ), :nay => Set.new } )
+					broadcast( "#{aid} declares '#{@word.join}' to be a word" )
 				end
 			else
 				# not turn
@@ -354,8 +387,75 @@ class G-Host
 	end
 
 	def challenge( aid )
-		
+		if state == :normal
+			if turn == aid
+				if @word.length < 3
+					send( aid, 'not at least three letters' )
+				else
+					challengee = @states.pop.data[:last_turn]
+					@states << S.new( :challenge, { :challenger => aid, :challengee => challengee, :length => @word.length } )
+					broadcast( "#{aid} challenges #{challengee} on '#{@word.join}'" )
+				end
+			else
+				# not turn
+			end
+		else
+			# not state
+		end
 	end
 
-	# and voting methods
+	def yea( aid )
+		if state == :declare
+			# it doesn't matter if you vote multiple times. the last one is counted, and you have until the last person votes.
+			
+			@states.last.data[:nay].remove( aid ) # idempotent
+			@states.last.data[:yea].add( aid ) # idempotent
+			
+			if @states.last.data[:yea].size + @states.last.data[:nay].size == @n
+				if @states.last.data[:yea].size > @states.last.data[:nay].size
+					# declarer wins
+				elsif @states.last.data[:yea].size < @states.last.data[:nay].size
+					# declaree wins
+				else
+					# it's a draw
+				end
+			else # more votes to count
+				send( aid, "you agree that '#{@word.join}' is a word" )
+			end
+		else
+			# wrong state
+		end
+	end
+	
+	def nay( aid )
+		if state == :declare
+			# it doesn't matter if you vote multiple times. the last one is counted, and you have until the last person votes.
+			
+			@states.last.data[:yea].remove( aid ) #idempotent
+			@states.last.data[:nay].add( aid ) # idempotent
+			send( aid, "you disagree that '#{@word.join}' is a word" )
+		else
+			# wrong state
+		end
+	end
 end
+
+=begin
+
+investigation of subclassing vs. delegation for broadcast/send
+
+if we have a framework where we simply designate each player by a number, we can keep track of the same information as if we had the names
+or something
+
+suppose we have a class that gathers players. when the game starts, it notifes players with resources and creates a game and changes its
+state. it remains the handler for the game. messages received by it are forwarded to the actual game. it implements broadcast and send.
+
+handle( socket )
+	socket -> client -> number
+	socket.read -> message
+	
+	game.send( message from number with arguments )
+end
+
+
+=end

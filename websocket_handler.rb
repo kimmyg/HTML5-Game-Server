@@ -1,4 +1,4 @@
-
+require 'lobby.rb'
 
 class WebSocketHandler
 	def initialize( server )
@@ -8,15 +8,6 @@ class WebSocketHandler
 	end
 	
 	def add( socket )
-		@lobby.add( socket )
-		
-		@server.setHandler( socket, self )
-			
-	end
-	
-	def handle( socket )
-		puts "websocket handle #{socket}"
-	
-		puts socket.ws_receive
+		@lobby.add( socket )	
 	end
 end
