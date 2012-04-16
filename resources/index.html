@@ -2,7 +2,7 @@
 <html>
 
 <head>
-<script type="text/javascript" src="js/prelude.js"></script>
+<script type="text/javascript" src="js/behavior.js"></script>
 <script type="text/javascript">
 window.addEventListener( 'load', function( event ) {
 	window.ws = new WebSocket( 'ws://' + window.location.host + '/' );
@@ -14,7 +14,17 @@ window.addEventListener( 'load', function( event ) {
 	window.ws.addEventListener( 'message', function( event ) {
 		var message = JSON.parse( event.data );
 
-		console.log( message );
+		if( message.type === 'load' ) {
+			load_css( message.package );
+			load_js( message.package );
+		}
+		else if( message.type === 'unload' ) {
+			unload_css( message.package );
+			unload_js( message.package );
+		}
+		else {
+			console.log( message );
+		}
 	});
 
 	window.ws.addEventListener( 'close', function( event ) {

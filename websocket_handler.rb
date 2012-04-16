@@ -8,6 +8,6 @@ class WebSocketHandler
 	end
 	
 	def add( socket )
-		@lobby.add( socket )	
+		@server.setHandler( socket, Client.new( socket, @lobby ) )
 	end
 end

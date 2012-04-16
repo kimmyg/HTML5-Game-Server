@@ -7,7 +7,7 @@ class Lobby
 	end
 
 	def add( socket )
-		socket.ws_send( { 'load' => 'lobby' }.to_json )	
+		socket.ws_send( { 'type' => 'load', 'package' => 'lobby' }.to_json )	
 	end
 	
 	def remove( socket )
