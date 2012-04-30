@@ -91,3 +91,31 @@ let's do this for bomgolf.
 
 we could do turns concurrently and synchronize at the end of rounds. we could 
 do round-robin. we could do sequential.
+
+update 4/18, the next day
+
+have we defined our turn policy? no, but let's make one up.
+turns proceed round-robin for each player that has not correctly guessed.
+the order of the turn is from the person with the most strokes to the person 
+with the least.
+once a player correctly guesses, they are out of the round.
+after each round, a scorecard is displayed. the next round starts when 
+everyone has dismissed it.
+
+there are three distinct states when a player could become disconnected:
+during their turn in a round
+during another's turn in a round
+during the scorecard
+
+the other person can reconnect, but only if the other players are 
+willing to wait to start the next round.
+
+* when the last player leaves the game, consider serializing the game state 
+to resume it later.
+
+there is a game definition unconcerned with minutia like the identity of 
+players. all that matters is the number of players and rounds. we will 
+define a wrapper object that has these concerns. because the "essence" 
+definition is concerned with just that, it has no notion of players 
+disconnecting. the notion of players leaving is apparent in the remove 
+player directive--only implemented by games that support it.
